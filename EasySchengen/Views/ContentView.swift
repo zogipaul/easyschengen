@@ -21,6 +21,15 @@ struct ContentView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     header(summary: summary)
+                    if let nextTrip = nextUpcomingTrip {
+                        UpcomingTripHero(
+                            trip: nextTrip,
+                            today: calendar.startOfDay(for: .now),
+                            calendar: calendar
+                        ) {
+                            editorContext = .edit(nextTrip)
+                        }
+                    }
                     summaryGrid(summary: summary)
                     calendarPanel(calculator: calculator, summary: summary)
                     tripsSection
@@ -70,6 +79,13 @@ struct ContentView: View {
 
     private var appearanceMode: AppearanceMode {
         AppearanceMode(rawValue: appearanceModeRawValue) ?? .dark
+    }
+
+    private var nextUpcomingTrip: Trip? {
+        let today = calendar.startOfDay(for: .now)
+        return trips
+            .filter { calendar.startOfDay(for: $0.startDate) > today }
+            .min { $0.startDate < $1.startDate }
     }
 
     private func header(summary: SchengenSummary) -> some View {
@@ -354,6 +370,85 @@ private struct SummaryCard: View {
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .stroke(Color.appBorder)
         )
+    }
+}
+
+private struct UpcomingTripHero: View {
+    var trip: Trip
+    var today: Date
+    var calendar: Calendar
+    var onTap: () -> Void
+
+    private var daysUntilDeparture: Int {
+        max(0, calendar.dateComponents([.day], from: today, to: trip.startDate).day ?? 0)
+    }
+
+    private var tripDayCount: Int {
+        (calendar.dateComponents([.day], from: trip.startDate, to: trip.endDate).day ?? 0) + 1
+    }
+
+    var body: some View {
+        Button(action: onTap) {
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("EU is waiting for you")
+                            .font(.title2.bold())
+                        Text("Your next Schengen trip starts soon")
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.8))
+                    }
+
+                    Spacer()
+
+                    Image(systemName: "airplane.departure")
+                        .font(.title2.weight(.semibold))
+                        .padding(12)
+                        .background(.white.opacity(0.16), in: Circle())
+                }
+
+                HStack(alignment: .lastTextBaseline, spacing: 7) {
+                    Text("\(daysUntilDeparture)")
+                        .font(.system(size: 54, weight: .bold, design: .rounded))
+                    Text(daysUntilDeparture == 1 ? "day to go" : "days to go")
+                        .font(.headline)
+                        .foregroundStyle(.white.opacity(0.85))
+                }
+
+                HStack(spacing: 8) {
+                    Label(
+                        "\(trip.startDate.formatted(date: .abbreviated, time: .omitted)) – \(trip.endDate.formatted(date: .abbreviated, time: .omitted))",
+                        systemImage: "calendar"
+                    )
+                    Spacer(minLength: 8)
+                    Text("\(tripDayCount) \(tripDayCount == 1 ? "day" : "days")")
+                }
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.9))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(20)
+            .foregroundStyle(.white)
+            .background(
+                LinearGradient(
+                    colors: [Color(red: 0.05, green: 0.24, blue: 0.58), Color(red: 0.12, green: 0.52, blue: 0.39)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+            )
+            .overlay(alignment: .bottomTrailing) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 72))
+                    .foregroundStyle(.white.opacity(0.08))
+                    .padding(10)
+                    .accessibilityHidden(true)
+            }
+            .shadow(color: Color.available.opacity(0.22), radius: 16, y: 8)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("EU is waiting for you. \(daysUntilDeparture) days until your next trip")
+        .accessibilityHint("Opens the trip")
     }
 }
 

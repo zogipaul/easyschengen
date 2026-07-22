@@ -36,9 +36,12 @@ struct TripEditorView: View {
         self.existingTrips = existingTrips
         self.onSave = onSave
         self.onDelete = onDelete
+        let calendar = Calendar.schengen
         let initialDate = context.trip?.startDate ?? context.initialStartDate ?? .now
-        _startDate = State(initialValue: initialDate)
-        _endDate = State(initialValue: context.trip?.endDate ?? initialDate)
+        let initialStartDay = calendar.startOfDay(for: initialDate)
+        let initialEndDay = calendar.startOfDay(for: context.trip?.endDate ?? initialStartDay)
+        _startDate = State(initialValue: initialStartDay)
+        _endDate = State(initialValue: max(initialStartDay, initialEndDay))
     }
 
     var body: some View {
@@ -47,10 +50,10 @@ struct TripEditorView: View {
                 Section("Dates") {
                     DatePicker("Entry", selection: $startDate, displayedComponents: .date)
 
-                    if let latestPossibleExit {
-                        DatePicker("Exit", selection: $endDate, in: startDate...latestPossibleExit, displayedComponents: .date)
+                    if let exitDateRange {
+                        DatePicker("Exit", selection: $endDate, in: exitDateRange, displayedComponents: .date)
                     } else {
-                        DatePicker("Exit", selection: $endDate, in: startDate...startDate, displayedComponents: .date)
+                        DatePicker("Exit", selection: $endDate, in: startDay...startDay, displayedComponents: .date)
                             .disabled(true)
                     }
                 }
@@ -58,9 +61,9 @@ struct TripEditorView: View {
                 Section("Allowance") {
                     LabeledContent("Trip length", value: "\(dayCount) \(dayCount == 1 ? "day" : "days")")
 
-                    if let latestPossibleExit {
+                    if let latestAvailableExit {
                         LabeledContent("Latest possible exit") {
-                            Text(latestPossibleExit.formatted(date: .abbreviated, time: .omitted))
+                            Text(latestAvailableExit.formatted(date: .abbreviated, time: .omitted))
                                 .foregroundStyle(Color.lastDay)
                         }
                     } else {
@@ -70,7 +73,11 @@ struct TripEditorView: View {
                         }
                     }
 
-                    if isPastLatestExit {
+                    if latestAvailableExit == nil {
+                        Label("No Schengen day is available for this entry date.", systemImage: "exclamationmark.triangle.fill")
+                            .font(.footnote)
+                            .foregroundStyle(Color.unavailable)
+                    } else if isPastLatestExit {
                         Label("Move the exit date earlier to stay within 90/180 days.", systemImage: "exclamationmark.triangle.fill")
                             .font(.footnote)
                             .foregroundStyle(Color.unavailable)
@@ -101,8 +108,8 @@ struct TripEditorView: View {
                     Button("Save") {
                         let trip = Trip(
                             id: context.trip?.id ?? UUID(),
-                            startDate: startDate,
-                            endDate: endDate,
+                            startDate: startDay,
+                            endDate: endDay,
                             calendar: calendar
                         )
                         onSave(trip)
@@ -112,10 +119,10 @@ struct TripEditorView: View {
                     .disabled(!canSave)
                 }
             }
-            .onChange(of: startDate) { _, newStart in
-                if endDate < newStart {
-                    endDate = newStart
-                }
+            .onChange(of: startDate) { _, _ in
+                clampExitDateIfNeeded()
+            }
+            .onChange(of: endDate) { _, _ in
                 clampExitDateIfNeeded()
             }
             .onAppear {
@@ -134,37 +141,74 @@ struct TripEditorView: View {
 
     private var latestPossibleExit: Date? {
         SchengenCalculator(trips: baseTrips, calendar: calendar)
-            .lastContinuousStayDay(from: startDate)
+            .lastContinuousStayDay(from: startDay)
+    }
+
+    private var latestAvailableExit: Date? {
+        guard let latestPossibleExit, latestPossibleExit >= startDay else {
+            return nil
+        }
+
+        return latestPossibleExit
+    }
+
+    private var exitDateRange: ClosedRange<Date>? {
+        guard let latestAvailableExit else {
+            return nil
+        }
+
+        return startDay...latestAvailableExit
     }
 
     private var isPastLatestExit: Bool {
-        guard let latestPossibleExit else {
+        guard let latestAvailableExit else {
             return true
         }
 
-        return calendar.startOfDay(for: endDate) > latestPossibleExit
+        return endDay > latestAvailableExit
     }
 
     private var canSave: Bool {
-        latestPossibleExit != nil && !isPastLatestExit
+        exitDateRange != nil && !isPastLatestExit
     }
 
     private var dayCount: Int {
-        calendar.dateComponents(
+        max(1, calendar.dateComponents(
             [.day],
-            from: calendar.startOfDay(for: startDate),
-            to: calendar.startOfDay(for: endDate)
-        ).day.map { $0 + 1 } ?? 1
+            from: startDay,
+            to: endDay
+        ).day.map { $0 + 1 } ?? 1)
+    }
+
+    private var startDay: Date {
+        calendar.startOfDay(for: startDate)
+    }
+
+    private var endDay: Date {
+        calendar.startOfDay(for: endDate)
     }
 
     private func clampExitDateIfNeeded() {
-        guard let latestPossibleExit else {
-            endDate = startDate
+        let normalizedStart = startDay
+        let normalizedEnd = endDay
+
+        if startDate != normalizedStart {
+            startDate = normalizedStart
+        }
+
+        guard let latestAvailableExit else {
+            if endDate != normalizedStart {
+                endDate = normalizedStart
+            }
             return
         }
 
-        if endDate > latestPossibleExit {
-            endDate = latestPossibleExit
+        if normalizedEnd < normalizedStart {
+            endDate = normalizedStart
+        } else if normalizedEnd > latestAvailableExit {
+            endDate = latestAvailableExit
+        } else if endDate != normalizedEnd {
+            endDate = normalizedEnd
         }
     }
 }
