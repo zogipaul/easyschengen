@@ -37,7 +37,7 @@ struct TripCountdownProvider: TimelineProvider {
     private func entry(at date: Date) -> TripCountdownEntry {
         let today = calendar.startOfDay(for: date)
         let trip = TripStore.load()
-            .filter { calendar.startOfDay(for: $0.startDate) > today }
+            .filter { calendar.startOfDay(for: $0.endDate) >= today }
             .min { $0.startDate < $1.startDate }
         return TripCountdownEntry(date: date, nextTrip: trip)
     }
@@ -61,6 +61,23 @@ struct TripCountdownWidgetView: View {
         )
     }
 
+    private func remainingDays(for trip: Trip) -> Int {
+        max(
+            1,
+            (calendar.dateComponents(
+                [.day],
+                from: calendar.startOfDay(for: entry.date),
+                to: calendar.startOfDay(for: trip.endDate)
+            ).day ?? 0) + 1
+        )
+    }
+
+    private func isCurrent(_ trip: Trip) -> Bool {
+        let today = calendar.startOfDay(for: entry.date)
+        return calendar.startOfDay(for: trip.startDate) <= today &&
+            calendar.startOfDay(for: trip.endDate) >= today
+    }
+
     var body: some View {
         Group {
             if let trip = entry.nextTrip, let countdown {
@@ -80,9 +97,12 @@ struct TripCountdownWidgetView: View {
     }
 
     private func countdownContent(trip: Trip, days: Int) -> some View {
-        VStack(alignment: .leading, spacing: family == .systemSmall ? 4 : 8) {
+        let current = isCurrent(trip)
+        let displayedDays = current ? remainingDays(for: trip) : days
+
+        return VStack(alignment: .leading, spacing: family == .systemSmall ? 4 : 8) {
             HStack {
-                Text("EU is waiting")
+                Text(current ? "TRIP IN PROGRESS" : "NEXT SCHENGEN TRIP")
                     .font(.caption.weight(.bold))
                     .foregroundStyle(.white.opacity(0.8))
                 Spacer()
@@ -93,18 +113,22 @@ struct TripCountdownWidgetView: View {
             Spacer(minLength: 0)
 
             HStack(alignment: .lastTextBaseline, spacing: 6) {
-                Text("\(days)")
+                Text("\(displayedDays)")
                     .font(.system(size: family == .systemSmall ? 46 : 52, weight: .bold, design: .rounded))
                     .minimumScaleFactor(0.7)
-                Text(days == 1 ? "DAY" : "DAYS")
+                Text(displayedDays == 1 ? "DAY" : "DAYS")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(.white.opacity(0.75))
             }
 
-            Text("until your next EU trip")
+            Text(current ? "remaining, including today" : "until your next trip")
                 .font(.caption.weight(.semibold))
 
-            Text(trip.startDate.formatted(.dateTime.day().month(.abbreviated).year()))
+            Text(
+                current
+                    ? "Ends \(trip.endDate.formatted(.dateTime.day().month(.abbreviated).year()))"
+                    : trip.startDate.formatted(.dateTime.day().month(.abbreviated).year())
+            )
                 .font(.caption2)
                 .foregroundStyle(.white.opacity(0.75))
         }
