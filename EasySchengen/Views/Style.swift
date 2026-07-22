@@ -51,41 +51,44 @@ enum AppearanceMode: String, CaseIterable, Identifiable {
 
 extension Color {
     static let appBackground = adaptive(
-        light: RGB(0.96, 0.97, 0.95),
-        dark: RGB(0.06, 0.08, 0.09)
+        light: RGB(0.96, 0.97, 0.99),
+        dark: RGB(0.035, 0.055, 0.09)
     )
     static let appSurface = adaptive(
-        light: RGB(1.00, 1.00, 1.00),
-        dark: RGB(0.11, 0.13, 0.15)
+        light: RGB(1.00, 1.00, 1.00, 0.92),
+        dark: RGB(0.075, 0.105, 0.16, 0.94)
     )
     static let appElevatedSurface = adaptive(
-        light: RGB(1.00, 1.00, 1.00),
-        dark: RGB(0.15, 0.17, 0.19)
+        light: RGB(0.965, 0.975, 0.995),
+        dark: RGB(0.105, 0.14, 0.21)
     )
     static let appBorder = adaptive(
-        light: RGB(0.00, 0.00, 0.00, 0.07),
-        dark: RGB(1.00, 1.00, 1.00, 0.10)
+        light: RGB(0.12, 0.22, 0.38, 0.09),
+        dark: RGB(0.70, 0.82, 1.00, 0.12)
     )
     static let ink = adaptive(
-        light: RGB(0.10, 0.15, 0.18),
-        dark: RGB(0.90, 0.94, 0.96)
+        light: RGB(0.07, 0.12, 0.22),
+        dark: RGB(0.93, 0.96, 1.00)
     )
     static let trip = adaptive(
-        light: RGB(0.00, 0.20, 0.60),
-        dark: RGB(0.25, 0.55, 0.90)
+        light: RGB(0.14, 0.34, 0.92),
+        dark: RGB(0.35, 0.58, 1.00)
     )
     static let available = adaptive(
-        light: RGB(0.12, 0.52, 0.39),
-        dark: RGB(0.35, 0.78, 0.61)
+        light: RGB(0.04, 0.58, 0.47),
+        dark: RGB(0.24, 0.82, 0.66)
     )
     static let unavailable = adaptive(
         light: RGB(0.68, 0.16, 0.14),
         dark: RGB(0.95, 0.42, 0.38)
     )
     static let lastDay = adaptive(
-        light: RGB(0.88, 0.46, 0.10),
-        dark: RGB(1.00, 0.64, 0.24)
+        light: RGB(0.96, 0.45, 0.12),
+        dark: RGB(1.00, 0.65, 0.28)
     )
+
+    static let brandIndigo = Color(red: 0.20, green: 0.29, blue: 0.88)
+    static let brandCyan = Color(red: 0.05, green: 0.68, blue: 0.72)
 
     private struct RGB {
         var red: Double
@@ -137,12 +140,34 @@ extension Color {
 extension View {
     func sectionSurface() -> some View {
         self
-            .padding(16)
-            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+            .padding(18)
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
                     .stroke(Color.appBorder)
             )
+            .shadow(color: Color.black.opacity(0.05), radius: 18, y: 8)
+    }
+
+    func appBackground() -> some View {
+        self.background {
+            ZStack {
+                Color.appBackground
+                RadialGradient(
+                    colors: [Color.brandIndigo.opacity(0.13), .clear],
+                    center: .topTrailing,
+                    startRadius: 0,
+                    endRadius: 420
+                )
+                RadialGradient(
+                    colors: [Color.brandCyan.opacity(0.08), .clear],
+                    center: .bottomLeading,
+                    startRadius: 0,
+                    endRadius: 360
+                )
+            }
+            .ignoresSafeArea()
+        }
     }
 
     @ViewBuilder

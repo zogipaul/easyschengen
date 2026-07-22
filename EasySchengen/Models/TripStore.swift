@@ -32,6 +32,7 @@ enum TripStore {
         }
 
         sharedDefaults.set(data, forKey: storageKey)
+        sharedDefaults.synchronize()
 
         #if canImport(WidgetKit)
         WidgetCenter.shared.reloadTimelines(ofKind: "EasySchengenCountdownWidget")
@@ -45,6 +46,11 @@ enum TripStore {
         }
 
         sharedDefaults.set(existingData, forKey: storageKey)
+        sharedDefaults.synchronize()
+
+        #if canImport(WidgetKit)
+        WidgetCenter.shared.reloadTimelines(ofKind: "EasySchengenCountdownWidget")
+        #endif
     }
 }
 

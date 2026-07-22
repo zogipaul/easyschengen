@@ -9,19 +9,19 @@ struct CalendarMonthView: View {
     var onSelectDate: (Date) -> Void
 
     private let calendar = Calendar.schengen
-    private let daySpacing: CGFloat = 6
-    private let calendarHeight: CGFloat = 336
+    private let daySpacing: CGFloat = 5
+    private let calendarHeight: CGFloat = 324
 
     var body: some View {
         GeometryReader { proxy in
-            let cellSize = max(32, min(42, floor((proxy.size.width - (daySpacing * 6)) / 7)))
+            let cellSize = max(32, min(44, floor((proxy.size.width - (daySpacing * 6)) / 7)))
             let columns = Array(repeating: GridItem(.fixed(cellSize), spacing: daySpacing), count: 7)
 
-            VStack(spacing: 10) {
+            VStack(spacing: 12) {
                 LazyVGrid(columns: columns, spacing: 8) {
                     ForEach(weekdaySymbols, id: \.self) { weekday in
                         Text(weekday)
-                            .font(.caption2.weight(.bold))
+                            .font(.system(size: 10, weight: .bold))
                             .foregroundStyle(.secondary)
                             .frame(width: cellSize)
                     }
@@ -70,15 +70,15 @@ private struct CalendarDayCell: View {
 
     var body: some View {
         ZStack {
-            Circle()
+            RoundedRectangle(cornerRadius: 13, style: .continuous)
                 .fill(backgroundColor)
                 .overlay {
-                    Circle()
+                    RoundedRectangle(cornerRadius: 13, style: .continuous)
                         .strokeBorder(borderColor, lineWidth: (evaluation.isLastContinuousDay || isNextPossibleEntry) ? 2.5 : 1.2)
                 }
 
             Text("\(Calendar.schengen.component(.day, from: evaluation.date))")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .font(.system(size: 14, weight: isToday ? .bold : .semibold, design: .rounded))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
@@ -89,14 +89,14 @@ private struct CalendarDayCell: View {
 
     private var backgroundColor: Color {
         if evaluation.isTripDay {
-            return .trip.opacity(0.35)
+            return .trip.opacity(0.23)
         }
 
         if evaluation.canBeSchengenDay {
-            return .available.opacity(0.16)
+            return .available.opacity(0.11)
         }
 
-        return .unavailable.opacity(0.18)
+        return .unavailable.opacity(0.10)
     }
 
     private var borderColor: Color {
@@ -105,7 +105,7 @@ private struct CalendarDayCell: View {
         }
 
         if isToday {
-            return .ink.opacity(0.55)
+            return .ink.opacity(0.75)
         }
 
         if evaluation.isTripDay {
@@ -139,24 +139,23 @@ struct LegendView: View {
     var nextPossibleEntryDate: Date?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Calendar key")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(.secondary)
-
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], alignment: .leading, spacing: 8) {
-                LegendItem(color: .trip, text: "Filled blue: planned trip")
-                LegendItem(color: .available, text: "Green: can enter")
-                LegendItem(color: .unavailable, text: "Red: no day left")
-                LegendItem(color: .lastDay, text: "Orange ring: latest exit", outlined: true)
-                LegendItem(color: .available, text: "Green ring: next entry", outlined: true)
+        VStack(alignment: .leading, spacing: 12) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    LegendItem(color: .trip, text: "Trip")
+                    LegendItem(color: .available, text: "Available")
+                    LegendItem(color: .unavailable, text: "Unavailable")
+                    LegendItem(color: .lastDay, text: "Latest exit", outlined: true)
+                }
             }
 
             if let nextPossibleEntryDate = nextPossibleEntryDate {
-                Text("Next possible entry: \(nextPossibleEntryDate.formatted(date: .long, time: .omitted))")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.primary)
-                    .padding(.top, 4)
+                Label(
+                    "Next possible entry: \(nextPossibleEntryDate.formatted(date: .abbreviated, time: .omitted))",
+                    systemImage: "arrow.right.circle.fill"
+                )
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Color.available)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -170,19 +169,21 @@ private struct LegendItem: View {
 
     var body: some View {
         HStack(spacing: 5) {
-            Circle()
+            RoundedRectangle(cornerRadius: 4, style: .continuous)
                 .fill(outlined ? Color.clear : color.opacity(0.22))
                 .overlay(
-                    Circle()
+                    RoundedRectangle(cornerRadius: 4, style: .continuous)
                         .stroke(color, lineWidth: outlined ? 2 : 0)
                 )
-                .frame(width: 12, height: 12)
+                .frame(width: 13, height: 13)
 
             Text(text)
                 .font(.caption2.weight(.medium))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
-                .minimumScaleFactor(0.8)
         }
+        .padding(.horizontal, 9)
+        .padding(.vertical, 7)
+        .background(Color.appElevatedSurface, in: Capsule())
     }
 }
