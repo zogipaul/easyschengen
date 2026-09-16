@@ -129,18 +129,28 @@ struct ContentView: View {
                 metricDivider
 
                 HeroMetric(
-                    value: summary.lastContinuousDay?.formatted(.dateTime.day().month(.abbreviated)) ?? "—",
-                    label: "Latest exit",
-                    symbol: "flag.checkered"
-                )
-
-                metricDivider
-
-                HeroMetric(
                     value: "\(trips.count)",
                     label: trips.count == 1 ? "Trip" : "Trips",
                     symbol: "suitcase.rolling.fill"
                 )
+            }
+
+            VStack(alignment: .leading, spacing: 5) {
+                Text(trips.contains {
+                    calendar.startOfDay(for: $0.startDate) <= summary.today &&
+                    calendar.startOfDay(for: $0.endDate) >= summary.today
+                } ? "If you continue your stay today" : "If you enter today")
+                    .font(.caption)
+                    .foregroundStyle(.white.opacity(0.7))
+                if let latestExit = summary.lastContinuousDay {
+                    Label("You can stay until \(latestExit.formatted(date: .abbreviated, time: .omitted))", systemImage: "flag.checkered")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                } else {
+                    Text("No stay available from today")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.white)
+                }
             }
         }
         .padding(22)
@@ -181,12 +191,35 @@ struct ContentView: View {
     }
 
     private func calendarPanel(calculator: SchengenCalculator, summary: SchengenSummary) -> some View {
-        VStack(alignment: .leading, spacing: 18) {
+        let stayContext = calculator.calendarStayContext(on: summary.today)
+        return VStack(alignment: .leading, spacing: 18) {
             SectionHeading(
                 eyebrow: "PLAN AHEAD",
                 title: "Travel calendar",
                 symbol: "calendar"
             )
+
+            VStack(alignment: .leading, spacing: 6) {
+                if stayContext.trip != nil {
+                    Text("For your trip starting \(stayContext.entryDate.formatted(date: .abbreviated, time: .omitted))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("If you enter today")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                if let latestExit = stayContext.latestExitDate {
+                    Label("Latest possible exit: \(latestExit.formatted(date: .abbreviated, time: .omitted))", systemImage: "flag.checkered")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.lastDay)
+                } else {
+                    Label("No entry available for this start date", systemImage: "exclamationmark.circle")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.unavailable)
+                }
+            }
 
             HStack {
                 monthButton(symbol: "chevron.left", label: "Previous month") {
@@ -220,7 +253,7 @@ struct ContentView: View {
                 month: visibleMonth,
                 today: summary.today,
                 calculator: calculator,
-                lastContinuousDay: summary.lastContinuousDay,
+                lastContinuousDay: stayContext.latestExitDate,
                 nextPossibleEntryDate: summary.nextPossibleEntryDate
             ) { date in
                 editorContext = .newTrip(startDate: date)

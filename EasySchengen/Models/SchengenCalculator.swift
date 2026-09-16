@@ -18,6 +18,12 @@ struct SchengenSummary: Hashable {
     var nextPossibleEntryDate: Date?
 }
 
+struct CalendarStayContext: Hashable {
+    var trip: Trip?
+    var entryDate: Date
+    var latestExitDate: Date?
+}
+
 struct SchengenCalculator {
     private let calendar: Calendar
     private let trips: [Trip]
@@ -43,6 +49,30 @@ struct SchengenCalculator {
             latestTripEnd: maxTripEnd,
             nextPossibleEntryDate: nextPossibleEntryDate(after: maxTripEnd, today: today)
         )
+    }
+
+    func calendarStayContext(on date: Date = .now) -> CalendarStayContext {
+        let today = calendar.startOfDay(for: date)
+        // A current trip sorts before any upcoming trip. Completed trips are ignored.
+        let trip = trips
+            .filter { calendar.startOfDay(for: $0.endDate) >= today }
+            .min { $0.startDate < $1.startDate }
+        let entryDate = trip.map { calendar.startOfDay(for: $0.startDate) } ?? today
+
+        return CalendarStayContext(
+            trip: trip,
+            entryDate: entryDate,
+            latestExitDate: latestPossibleExit(from: entryDate, excluding: trip?.id)
+        )
+    }
+
+    // Use the same entry-date scenario in the calendar and the trip editor.
+    func latestPossibleExit(from entryDate: Date, excluding tripID: UUID? = nil) -> Date? {
+        guard let tripID else { return lastContinuousStayDay(from: entryDate) }
+        return SchengenCalculator(
+            trips: trips.filter { $0.id != tripID },
+            calendar: calendar
+        ).lastContinuousStayDay(from: entryDate)
     }
 
     func nextPossibleEntryDate(after latestTripEnd: Date?, today: Date) -> Date? {

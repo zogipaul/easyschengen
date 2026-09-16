@@ -202,6 +202,9 @@ struct TripEditorView: View {
                         .foregroundStyle(.secondary)
                     Text(latestAvailableExit?.formatted(date: .long, time: .omitted) ?? "No entry available")
                         .font(.subheadline.weight(.bold))
+                    Text("Based on entry on \(startDay.formatted(date: .abbreviated, time: .omitted))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
                 Spacer()
             }
@@ -255,13 +258,9 @@ struct TripEditorView: View {
         return nil
     }
 
-    private var baseTrips: [Trip] {
-        guard let currentTrip = context.trip else { return existingTrips }
-        return existingTrips.filter { $0.id != currentTrip.id }
-    }
-
     private var latestPossibleExit: Date? {
-        SchengenCalculator(trips: baseTrips, calendar: calendar).lastContinuousStayDay(from: startDay)
+        SchengenCalculator(trips: existingTrips, calendar: calendar)
+            .latestPossibleExit(from: startDay, excluding: context.trip?.id)
     }
 
     private var latestAvailableExit: Date? {

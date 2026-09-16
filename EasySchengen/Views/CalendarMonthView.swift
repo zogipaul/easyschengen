@@ -131,7 +131,8 @@ private struct CalendarDayCell: View {
             status = "not available"
         }
 
-        return "\(evaluation.date.formatted(date: .complete, time: .omitted)), \(status)"
+        let exitStatus = evaluation.isLastContinuousDay ? ", latest possible exit for the displayed entry date" : ""
+        return "\(evaluation.date.formatted(date: .complete, time: .omitted)), \(status)\(exitStatus)"
     }
 }
 
