@@ -27,17 +27,35 @@ struct CalendarStayContext: Hashable {
 struct SchengenCalculator {
     private let calendar: Calendar
     private let trips: [Trip]
-    private let tripDays: Set<Date>
+    // Calendar-day offsets keep DST days inclusive without allocating every travel day.
+    private let epoch: Date
+    private let tripRanges: [ClosedRange<Int>]
 
     init(trips: [Trip], calendar: Calendar = .schengen) {
         self.calendar = calendar
         self.trips = trips
-        self.tripDays = Self.tripDaySet(for: trips, calendar: calendar)
+        let epoch = calendar.startOfDay(for: Date(timeIntervalSinceReferenceDate: 0))
+        self.epoch = epoch
+        let ranges = trips.compactMap { trip -> ClosedRange<Int>? in
+            let start = calendar.dateComponents([.day], from: epoch, to: calendar.startOfDay(for: trip.startDate)).day ?? 0
+            let end = calendar.dateComponents([.day], from: epoch, to: calendar.startOfDay(for: trip.endDate)).day ?? 0
+            guard end >= start else { return nil }
+            return start...end
+        }.sorted { $0.lowerBound < $1.lowerBound }
+        var merged: [ClosedRange<Int>] = []
+        for range in ranges {
+            if let last = merged.last, range.lowerBound <= last.upperBound + 1 {
+                merged[merged.count - 1] = last.lowerBound...max(last.upperBound, range.upperBound)
+            } else {
+                merged.append(range)
+            }
+        }
+        self.tripRanges = merged
     }
 
     func summary(on date: Date = .now) -> SchengenSummary {
         let today = calendar.startOfDay(for: date)
-        let used = usedDays(endingOn: today, includingExtraDay: nil)
+        let used = usedDays(endingOn: dayIndex(today))
         let remaining = max(0, 90 - used)
         let maxTripEnd = trips.map(\.endDate).max()
 
@@ -86,7 +104,8 @@ struct SchengenCalculator {
         var dayToCheck = calendar.date(byAdding: .day, value: 1, to: searchBase) ?? searchBase
 
         for _ in 0..<370 {
-            let usedIfAdded = usedDays(endingOn: dayToCheck, includingExtraDays: [dayToCheck])
+            let index = dayIndex(dayToCheck)
+            let usedIfAdded = usedDays(endingOn: index) + (isTripDay(index) ? 0 : 1)
             if usedIfAdded <= 90 {
                 return dayToCheck
             }
@@ -100,9 +119,10 @@ struct SchengenCalculator {
 
     func evaluation(for date: Date, lastContinuousDay: Date?) -> DayEvaluation {
         let day = calendar.startOfDay(for: date)
-        let isTripDay = tripDays.contains(day)
-        let used = usedDays(endingOn: day, includingExtraDay: nil)
-        let usedIfAdded = usedDays(endingOn: day, includingExtraDays: isTripDay ? [] : [day])
+        let index = dayIndex(day)
+        let isTripDay = isTripDay(index)
+        let used = usedDays(endingOn: index)
+        let usedIfAdded = used + (isTripDay ? 0 : 1)
 
         return DayEvaluation(
             date: day,
@@ -115,25 +135,17 @@ struct SchengenCalculator {
     }
 
     func lastContinuousStayDay(from startDate: Date = .now) -> Date? {
-        var day = calendar.startOfDay(for: startDate)
-        var lastAllowed: Date?
-        var continuousStayDays = Set<Date>()
+        let start = dayIndex(startDate)
+        var lastAllowed: Int?
 
-        for _ in 0..<370 {
-            continuousStayDays.insert(day)
-            let usedIfStayed = usedDays(endingOn: day, includingExtraDays: continuousStayDays)
-            guard usedIfStayed <= 90 else {
-                break
-            }
-
+        // The hypothetical stay already covers every day from entry onwards.
+        // Count only history before entry, so overlaps and future plans count once.
+        for day in start...(start + 90) {
+            let history = countTripDays(from: day - 179, through: start - 1)
+            guard history + day - start + 1 <= 90 else { break }
             lastAllowed = day
-            guard let nextDay = calendar.date(byAdding: .day, value: 1, to: day) else {
-                break
-            }
-            day = nextDay
         }
-
-        return lastAllowed
+        return lastAllowed.flatMap { calendar.date(byAdding: .day, value: $0, to: epoch) }
     }
 
     func monthDates(containing date: Date) -> [Date?] {
@@ -160,42 +172,42 @@ struct SchengenCalculator {
         return days
     }
 
-    private func usedDays(endingOn date: Date, includingExtraDay extraDay: Date?) -> Int {
-        usedDays(endingOn: date, includingExtraDays: extraDay.map { [$0] } ?? [])
+    private func dayIndex(_ date: Date) -> Int {
+        calendar.dateComponents([.day], from: epoch, to: calendar.startOfDay(for: date)).day ?? 0
     }
 
-    private func usedDays(endingOn date: Date, includingExtraDays extraDays: Set<Date>) -> Int {
-        guard let windowStart = calendar.date(byAdding: .day, value: -179, to: date) else {
-            return 0
-        }
-
-        var days = tripDays.filter { day in
-            day >= windowStart && day <= date
-        }
-
-        for extraDay in extraDays where extraDay >= windowStart && extraDay <= date {
-            days.insert(extraDay)
-        }
-
-        return days.count
+    private func usedDays(endingOn day: Int) -> Int {
+        countTripDays(from: day - 179, through: day)
     }
 
-    private static func tripDaySet(for trips: [Trip], calendar: Calendar) -> Set<Date> {
-        var days = Set<Date>()
+    private func isTripDay(_ day: Int) -> Bool {
+        let index = firstRange(endingOnOrAfter: day)
+        return index < tripRanges.count && tripRanges[index].lowerBound <= day
+    }
 
-        for trip in trips {
-            var day = calendar.startOfDay(for: trip.startDate)
-            let end = calendar.startOfDay(for: trip.endDate)
-
-            while day <= end {
-                days.insert(day)
-                guard let nextDay = calendar.date(byAdding: .day, value: 1, to: day) else {
-                    break
-                }
-                day = nextDay
+    private func firstRange(endingOnOrAfter day: Int) -> Int {
+        var lower = 0
+        var upper = tripRanges.count
+        while lower < upper {
+            let middle = lower + (upper - lower) / 2
+            if tripRanges[middle].upperBound < day {
+                lower = middle + 1
+            } else {
+                upper = middle
             }
         }
+        return lower
+    }
 
-        return days
+    private func countTripDays(from start: Int, through end: Int) -> Int {
+        guard start <= end else { return 0 }
+        var index = firstRange(endingOnOrAfter: start)
+        var count = 0
+        while index < tripRanges.count && tripRanges[index].lowerBound <= end {
+            let range = tripRanges[index]
+            count += min(end, range.upperBound) - max(start, range.lowerBound) + 1
+            index += 1
+        }
+        return count
     }
 }

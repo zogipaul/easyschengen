@@ -1,21 +1,40 @@
 import SwiftUI
 
+private struct DashboardSnapshot {
+    let calculator: SchengenCalculator
+    let summary: SchengenSummary
+    let stayContext: CalendarStayContext
+    let statistics: TravelStatistics
+
+    init(trips: [Trip], calendar: Calendar, on date: Date = .now) {
+        calculator = SchengenCalculator(trips: trips, calendar: calendar)
+        summary = calculator.summary(on: date)
+        stayContext = calculator.calendarStayContext(on: date)
+        statistics = TravelStatistics(trips: trips, on: date, calendar: calendar)
+    }
+}
+
 struct ContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @AppStorage("appearanceMode") private var appearanceModeRawValue = AppearanceMode.system.rawValue
 
     @State private var trips: [Trip]
+    @State private var snapshot: DashboardSnapshot
     @State private var visibleMonth = Date.now
     @State private var editorContext: TripEditorContext?
 
     private let calendar = Calendar.schengen
 
     init() {
-        _trips = State(initialValue: TripStore.load())
+        let trips = TripStore.load()
+        _trips = State(initialValue: trips)
+        _snapshot = State(initialValue: DashboardSnapshot(trips: trips, calendar: .schengen))
     }
 
     var body: some View {
-        let calculator = SchengenCalculator(trips: trips, calendar: calendar)
-        let summary = calculator.summary()
+        let calculator = snapshot.calculator
+        let summary = snapshot.summary
 
         NavigationStack {
             ScrollView {
@@ -29,6 +48,7 @@ struct ContentView: View {
                     }
 
                     calendarPanel(calculator: calculator, summary: summary)
+                    TravelStatsCard(statistics: snapshot.statistics)
                     tripsSection
                 }
                 .padding(.horizontal, 16)
@@ -79,10 +99,21 @@ struct ContentView: View {
             }
             .onChange(of: trips) { _, newTrips in
                 TripStore.save(newTrips)
+                refreshSnapshot()
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { refreshSnapshot() }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
+                refreshSnapshot()
             }
         }
         .preferredColorScheme(appearanceMode.colorScheme)
         .tint(.brandIndigo)
+    }
+
+    private func refreshSnapshot() {
+        snapshot = DashboardSnapshot(trips: trips, calendar: .schengen)
     }
 
     private var appearanceMode: AppearanceMode {
@@ -90,7 +121,7 @@ struct ContentView: View {
     }
 
     private var nextUpcomingTrip: Trip? {
-        let today = calendar.startOfDay(for: .now)
+        let today = snapshot.summary.today
         return trips
             .filter { calendar.startOfDay(for: $0.startDate) > today }
             .min { $0.startDate < $1.startDate }
@@ -98,7 +129,10 @@ struct ContentView: View {
 
     private func allowanceHero(summary: SchengenSummary) -> some View {
         VStack(alignment: .leading, spacing: 22) {
-            HStack(alignment: .center, spacing: 16) {
+            let layout = dynamicTypeSize.isAccessibilitySize
+                ? AnyLayout(VStackLayout(alignment: .leading, spacing: 16))
+                : AnyLayout(HStackLayout(alignment: .center, spacing: 16))
+            layout {
                 AvailabilityRing(available: summary.availableToday)
 
                 VStack(alignment: .leading, spacing: 6) {
@@ -191,7 +225,7 @@ struct ContentView: View {
     }
 
     private func calendarPanel(calculator: SchengenCalculator, summary: SchengenSummary) -> some View {
-        let stayContext = calculator.calendarStayContext(on: summary.today)
+        let stayContext = snapshot.stayContext
         return VStack(alignment: .leading, spacing: 18) {
             SectionHeading(
                 eyebrow: "PLAN AHEAD",
@@ -297,7 +331,7 @@ struct ContentView: View {
             }
 
             let sortedTrips = trips.sortedForDisplay()
-            let today = calendar.startOfDay(for: .now)
+            let today = snapshot.summary.today
             let currentTrips = sortedTrips.filter { TripStatus.status(for: $0, today: today) == .current }
             let upcomingTrips = sortedTrips.filter { TripStatus.status(for: $0, today: today) == .upcoming }
             let pastTrips = sortedTrips.filter { TripStatus.status(for: $0, today: today) == .past }.reversed()
@@ -305,7 +339,7 @@ struct ContentView: View {
             if sortedTrips.isEmpty {
                 EmptyTripsView { editorContext = .new }
             } else {
-                VStack(alignment: .leading, spacing: 20) {
+                LazyVStack(alignment: .leading, spacing: 20) {
                     TripGroup(title: "In progress", trips: Array(currentTrips), today: today, calendar: calendar) { editorContext = .edit($0) }
                     TripGroup(title: "Coming up", trips: Array(upcomingTrips), today: today, calendar: calendar) { editorContext = .edit($0) }
                     TripGroup(title: "Past", trips: Array(pastTrips), today: today, calendar: calendar) { editorContext = .edit($0) }
@@ -446,12 +480,12 @@ private struct TripGroup: View {
 
     var body: some View {
         if !trips.isEmpty {
-            VStack(alignment: .leading, spacing: 9) {
+            LazyVStack(alignment: .leading, spacing: 9) {
                 Text(title.uppercased())
                     .font(.caption2.weight(.bold))
                     .tracking(0.8)
                     .foregroundStyle(.secondary)
-                VStack(spacing: 8) {
+                LazyVStack(spacing: 8) {
                     ForEach(trips) { trip in
                         TripRow(trip: trip, today: today, calendar: calendar) { onTap(trip) }
                     }
@@ -494,6 +528,10 @@ private struct UpcomingTripCard: View {
                         .foregroundStyle(Color.brandIndigo)
                     Text(trip.startDate.formatted(.dateTime.month(.wide).day()))
                         .font(.title3.weight(.bold))
+                    if let country = trip.country {
+                        Text(country.title)
+                            .font(.subheadline.weight(.semibold))
+                    }
                     Text("\(trip.startDate.formatted(.dateTime.day().month(.abbreviated))) – \(trip.endDate.formatted(.dateTime.day().month(.abbreviated)))  ·  \(tripDayCount) days")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -537,6 +575,10 @@ private struct TripRow: View {
                 .background(status.color.opacity(0.1), in: RoundedRectangle(cornerRadius: 13))
 
                 VStack(alignment: .leading, spacing: 4) {
+                    if let country = trip.country {
+                        Text(country.title)
+                            .font(.subheadline.weight(.semibold))
+                    }
                     Text("\(trip.startDate.formatted(.dateTime.month(.abbreviated).day())) – \(trip.endDate.formatted(.dateTime.month(.abbreviated).day().year()))")
                         .font(.subheadline.weight(.semibold))
                     Text("\(dayCount) Schengen \(dayCount == 1 ? "day" : "days")")
@@ -561,7 +603,81 @@ private struct TripRow: View {
             .background(Color.appElevatedSurface, in: RoundedRectangle(cornerRadius: 17, style: .continuous))
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(status.rawValue) trip, \(dayCount) days")
+        .accessibilityLabel("\(status.rawValue) trip, \(trip.country?.name ?? "Schengen Area"), \(trip.startDate.formatted(date: .abbreviated, time: .omitted)) to \(trip.endDate.formatted(date: .abbreviated, time: .omitted)), \(dayCount) days")
+    }
+}
+
+private struct TravelStatsCard: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    let statistics: TravelStatistics
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            SectionHeading(eyebrow: "YOUR JOURNEY", title: "Travel stats", symbol: "chart.bar.xaxis")
+            Text("All time · through today")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            let columns = dynamicTypeSize.isAccessibilitySize ? 1 : 3
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), alignment: .top), count: columns), spacing: 10) {
+                metric(statistics.tripsTaken, title: "Trips taken", symbol: "suitcase.rolling", color: .brandIndigo)
+                metric(statistics.visitedCountries.count, title: "Countries", symbol: "globe.europe.africa", color: .available)
+                metric(statistics.travelDays, title: "Travel days", symbol: "sun.max", color: .lastDay)
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("\(statistics.visitedCountries.count) of \(SchengenCountry.allCases.count) Schengen countries visited")
+                    .font(.caption.weight(.medium))
+                ProgressView(value: Double(statistics.visitedCountries.count), total: Double(SchengenCountry.allCases.count))
+                    .tint(Color.available)
+                    .accessibilityLabel("Schengen countries visited")
+                    .accessibilityValue("\(statistics.visitedCountries.count) of \(SchengenCountry.allCases.count)")
+            }
+
+            if !statistics.visitedCountries.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(statistics.visitedCountries) { country in
+                            Text(country.title)
+                                .font(.caption.weight(.medium))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 7)
+                                .background(Color.appElevatedSurface, in: Capsule())
+                        }
+                    }
+                }
+            }
+
+            if statistics.tripsWithoutCountry > 0 {
+                Text("Add destinations to \(statistics.tripsWithoutCountry) \(statistics.tripsWithoutCountry == 1 ? "trip" : "trips") in your history to complete your country count.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else if statistics.tripsTaken == 0 {
+                Text("Your stats grow as you travel. Upcoming trips count from their entry date.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .sectionSurface()
+    }
+
+    private func metric(_ value: Int, title: String, symbol: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Image(systemName: symbol)
+                .font(.subheadline)
+                .foregroundStyle(color)
+                .accessibilityHidden(true)
+            Text(value.formatted())
+                .font(.title2.weight(.bold))
+                .monospacedDigit()
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(color.opacity(0.08), in: RoundedRectangle(cornerRadius: 16))
+        .accessibilityElement(children: .combine)
     }
 }
 

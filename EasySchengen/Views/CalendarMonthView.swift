@@ -88,6 +88,10 @@ private struct CalendarDayCell: View {
     }
 
     private var backgroundColor: Color {
+        if !evaluation.canBeSchengenDay {
+            return .unavailable.opacity(0.18)
+        }
+
         if evaluation.isTripDay {
             return .trip.opacity(0.23)
         }
@@ -122,7 +126,7 @@ private struct CalendarDayCell: View {
     private var accessibilityLabel: String {
         let status: String
         if evaluation.isTripDay {
-            status = "planned trip day"
+            status = evaluation.canBeSchengenDay ? "planned trip day" : "planned trip day, exceeds allowance"
         } else if isNextPossibleEntry {
             status = "next possible entry date, available Schengen day"
         } else if evaluation.canBeSchengenDay {
@@ -132,7 +136,7 @@ private struct CalendarDayCell: View {
         }
 
         let exitStatus = evaluation.isLastContinuousDay ? ", latest possible exit for the displayed entry date" : ""
-        return "\(evaluation.date.formatted(date: .complete, time: .omitted)), \(status)\(exitStatus)"
+        return "\(evaluation.date.formatted(date: .complete, time: .omitted)), \(status)\(exitStatus), \(evaluation.usedDays) days used, \(evaluation.remainingDays) days remaining"
     }
 }
 

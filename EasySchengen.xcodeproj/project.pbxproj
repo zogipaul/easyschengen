@@ -20,6 +20,7 @@
 		1A000001000000000000000B /* Trip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000010000000000000016 /* Trip.swift */; };
 		1A000001000000000000000C /* TripStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0000010000000000000017 /* TripStore.swift */; };
 		1A000001000000000000000D /* EasySchengenWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 1A000001000000000000001A /* EasySchengenWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		1A000001000000000000000E /* TravelStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A000001000000000000001F /* TravelStatistics.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +63,7 @@
 		1A000001000000000000001C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1A000001000000000000001D /* EasySchengen.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = EasySchengen.entitlements; sourceTree = "<group>"; };
 		1A000001000000000000001E /* EasySchengenWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = EasySchengenWidget.entitlements; sourceTree = "<group>"; };
+		1A000001000000000000001F /* TravelStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelStatistics.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +111,7 @@
 				1A0000010000000000000016 /* Trip.swift */,
 				1A0000010000000000000017 /* TripStore.swift */,
 				1A0000010000000000000018 /* SchengenCalculator.swift */,
+				1A000001000000000000001F /* TravelStatistics.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -250,6 +253,7 @@
 				1A0000010000000000000006 /* Trip.swift in Sources */,
 				1A0000010000000000000007 /* TripStore.swift in Sources */,
 				1A0000010000000000000008 /* SchengenCalculator.swift in Sources */,
+				1A000001000000000000000E /* TravelStatistics.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -398,7 +402,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = EasySchengen/EasySchengen.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = XPBXXT8W37;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Easy Schengen";
@@ -409,7 +413,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.easyschengen.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -426,7 +430,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = EasySchengen/EasySchengen.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = XPBXXT8W37;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Easy Schengen";
@@ -437,7 +441,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.easyschengen.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -453,11 +457,11 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = EasySchengenWidget/EasySchengenWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = XPBXXT8W37;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = EasySchengenWidget/Info.plist;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.easyschengen.app.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -474,11 +478,11 @@
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = EasySchengenWidget/EasySchengenWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = XPBXXT8W37;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = EasySchengenWidget/Info.plist;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.easyschengen.app.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

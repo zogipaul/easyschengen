@@ -20,6 +20,7 @@ struct TripEditorContext: Identifiable {
 
 struct TripEditorView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var context: TripEditorContext
     var existingTrips: [Trip]
@@ -28,7 +29,9 @@ struct TripEditorView: View {
 
     @State private var startDate: Date
     @State private var endDate: Date
+    @State private var country: SchengenCountry?
     @State private var showingDeleteConfirmation = false
+    @State private var latestPossibleExit: Date?
 
     private let calendar = Calendar.schengen
 
@@ -43,6 +46,9 @@ struct TripEditorView: View {
         let initialEndDay = calendar.startOfDay(for: context.trip?.endDate ?? initialStartDay)
         _startDate = State(initialValue: initialStartDay)
         _endDate = State(initialValue: max(initialStartDay, initialEndDay))
+        _country = State(initialValue: context.trip?.country)
+        _latestPossibleExit = State(initialValue: SchengenCalculator(trips: existingTrips, calendar: calendar)
+            .latestPossibleExit(from: initialStartDay, excluding: context.trip?.id))
     }
 
     var body: some View {
@@ -50,6 +56,7 @@ struct TripEditorView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     tripSummary
+                    destinationSection
                     datesSection
                     allowanceSection
 
@@ -76,7 +83,11 @@ struct TripEditorView: View {
                         .disabled(!canSave)
                 }
             }
-            .onChange(of: startDate) { _, _ in clampExitDateIfNeeded() }
+            .onChange(of: startDate) { _, _ in
+                refreshAllowance()
+                clampExitDateIfNeeded()
+            }
+            .onChange(of: existingTrips) { _, _ in refreshAllowance() }
             .onChange(of: endDate) { _, _ in clampExitDateIfNeeded() }
             .onAppear { clampExitDateIfNeeded() }
             .confirmationDialog(
@@ -99,7 +110,10 @@ struct TripEditorView: View {
     }
 
     private var tripSummary: some View {
-        HStack(spacing: 16) {
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 16))
+            : AnyLayout(HStackLayout(spacing: 16))
+        return layout {
             ZStack {
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .fill(.white.opacity(0.14))
@@ -116,7 +130,7 @@ struct TripEditorView: View {
                     .foregroundStyle(.white.opacity(0.72))
             }
 
-            Spacer()
+            if !dynamicTypeSize.isAccessibilitySize { Spacer() }
 
             Image(systemName: canSave ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
                 .font(.title2)
@@ -136,6 +150,35 @@ struct TripEditorView: View {
         .animation(.easeInOut(duration: 0.2), value: dayCount)
     }
 
+    private var destinationSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            editorHeading("Destination", symbol: "globe.europe.africa")
+
+            NavigationLink {
+                SchengenCountryPicker(selection: $country)
+            } label: {
+                HStack(spacing: 12) {
+                    Text(country?.title ?? "Choose a country")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.primary)
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(.secondary)
+                }
+                .padding(14)
+                .background(Color.appElevatedSurface, in: RoundedRectangle(cornerRadius: 14))
+            }
+            .accessibilityLabel("Schengen country")
+            .accessibilityValue(country?.name ?? "Not specified")
+
+            Text("Optional. For a multi-country journey, add a trip for each country.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .sectionSurface()
+    }
+
     private var datesSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             editorHeading("Travel dates", symbol: "calendar")
@@ -149,14 +192,8 @@ struct TripEditorView: View {
                 Divider().padding(.leading, 52)
 
                 dateRow(title: "Exit", subtitle: "Last day in the Schengen Area", symbol: "airplane.departure") {
-                    if let exitDateRange {
-                        DatePicker("Exit date", selection: $endDate, in: exitDateRange, displayedComponents: .date)
-                            .labelsHidden()
-                    } else {
-                        Text("Unavailable")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(Color.unavailable)
-                    }
+                    DatePicker("Exit date", selection: $endDate, in: startDay..., displayedComponents: .date)
+                        .labelsHidden()
                 }
             }
             .background(Color.appElevatedSurface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
@@ -165,21 +202,27 @@ struct TripEditorView: View {
     }
 
     private func dateRow<Content: View>(title: String, subtitle: String, symbol: String, @ViewBuilder content: () -> Content) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: symbol)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(Color.brandIndigo)
-                .frame(width: 38, height: 38)
-                .background(Color.brandIndigo.opacity(0.1), in: Circle())
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 12))
+            : AnyLayout(HStackLayout(spacing: 12))
+        return layout {
+            HStack(spacing: 12) {
+                Image(systemName: symbol)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.brandIndigo)
+                    .frame(width: 38, height: 38)
+                    .background(Color.brandIndigo.opacity(0.1), in: Circle())
+                    .accessibilityHidden(true)
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.subheadline.weight(.semibold))
-                Text(subtitle)
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title).font(.subheadline.weight(.semibold))
+                    Text(subtitle)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+                .fixedSize(horizontal: false, vertical: true)
             }
-
-            Spacer(minLength: 8)
+            if !dynamicTypeSize.isAccessibilitySize { Spacer(minLength: 8) }
             content()
         }
         .padding(13)
@@ -258,8 +301,8 @@ struct TripEditorView: View {
         return nil
     }
 
-    private var latestPossibleExit: Date? {
-        SchengenCalculator(trips: existingTrips, calendar: calendar)
+    private func refreshAllowance() {
+        latestPossibleExit = SchengenCalculator(trips: existingTrips, calendar: calendar)
             .latestPossibleExit(from: startDay, excluding: context.trip?.id)
     }
 
@@ -268,17 +311,12 @@ struct TripEditorView: View {
         return latestPossibleExit
     }
 
-    private var exitDateRange: ClosedRange<Date>? {
-        guard let latestAvailableExit else { return nil }
-        return startDay...latestAvailableExit
-    }
-
     private var isPastLatestExit: Bool {
         guard let latestAvailableExit else { return true }
         return endDay > latestAvailableExit
     }
 
-    private var canSave: Bool { exitDateRange != nil && !isPastLatestExit }
+    private var canSave: Bool { endDay >= startDay && !isPastLatestExit }
 
     private var dayCount: Int {
         max(1, calendar.dateComponents([.day], from: startDay, to: endDay).day.map { $0 + 1 } ?? 1)
@@ -288,10 +326,12 @@ struct TripEditorView: View {
     private var endDay: Date { calendar.startOfDay(for: endDate) }
 
     private func save() {
+        guard canSave else { return }
         let trip = Trip(
             id: context.trip?.id ?? UUID(),
             startDate: startDay,
             endDate: endDay,
+            country: country,
             calendar: calendar
         )
         onSave(trip)
@@ -304,17 +344,63 @@ struct TripEditorView: View {
 
         if startDate != normalizedStart { startDate = normalizedStart }
 
-        guard let latestAvailableExit else {
-            if endDate != normalizedStart { endDate = normalizedStart }
-            return
-        }
-
+        // Never shorten a saved trip merely by opening the editor. Invalid
+        // allowance dates stay visible with validation until the user fixes them.
         if normalizedEnd < normalizedStart {
             endDate = normalizedStart
-        } else if normalizedEnd > latestAvailableExit {
-            endDate = latestAvailableExit
         } else if endDate != normalizedEnd {
             endDate = normalizedEnd
         }
+    }
+}
+
+private struct SchengenCountryPicker: View {
+    @Environment(\.dismiss) private var dismiss
+    @Binding var selection: SchengenCountry?
+    @State private var searchText = ""
+
+    private var countries: [SchengenCountry] {
+        SchengenCountry.allCases.filter {
+            searchText.isEmpty || $0.name.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
+    var body: some View {
+        List {
+            if searchText.isEmpty {
+                countryOption(nil)
+            }
+            ForEach(countries) { country in
+                countryOption(country)
+            }
+        }
+        .overlay {
+            if countries.isEmpty {
+                ContentUnavailableView.search(text: searchText)
+            }
+        }
+        .searchable(text: $searchText, prompt: "Find a country")
+        .navigationTitle("Schengen country")
+        .inlineNavigationTitleWhenAvailable()
+    }
+
+    private func countryOption(_ country: SchengenCountry?) -> some View {
+        Button {
+            selection = country
+            dismiss()
+        } label: {
+            HStack {
+                Text(country?.title ?? "Not specified")
+                    .foregroundStyle(.primary)
+                Spacer()
+                if selection == country {
+                    Image(systemName: "checkmark")
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Color.brandIndigo)
+                }
+            }
+            .contentShape(Rectangle())
+        }
+        .accessibilityAddTraits(selection == country ? .isSelected : [])
     }
 }
