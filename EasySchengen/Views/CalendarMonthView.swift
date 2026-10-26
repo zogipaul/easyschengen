@@ -10,49 +10,47 @@ struct CalendarMonthView: View {
 
     private let calendar = Calendar.schengen
     private let daySpacing: CGFloat = 5
-    private let calendarHeight: CGFloat = 324
+    // Flexible columns let the grid size its own height, so it never clips
+    // at large text sizes or on narrow screens.
+    private var columns: [GridItem] {
+        Array(repeating: GridItem(.flexible(minimum: 32, maximum: 44), spacing: daySpacing), count: 7)
+    }
 
     var body: some View {
-        GeometryReader { proxy in
-            let cellSize = max(32, min(44, floor((proxy.size.width - (daySpacing * 6)) / 7)))
-            let columns = Array(repeating: GridItem(.fixed(cellSize), spacing: daySpacing), count: 7)
-
-            VStack(spacing: 12) {
-                LazyVGrid(columns: columns, spacing: 8) {
-                    ForEach(weekdaySymbols, id: \.self) { weekday in
-                        Text(weekday)
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundStyle(.secondary)
-                            .frame(width: cellSize)
-                    }
+        VStack(spacing: 12) {
+            LazyVGrid(columns: columns, spacing: 8) {
+                ForEach(weekdaySymbols.indices, id: \.self) { index in
+                    Text(weekdaySymbols[index])
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                 }
+            }
+            .accessibilityHidden(true)
 
-                LazyVGrid(columns: columns, spacing: daySpacing) {
-                    ForEach(Array(calculator.monthDates(containing: month).enumerated()), id: \.offset) { _, date in
-                        if let date {
-                            let evaluation = calculator.evaluation(for: date, lastContinuousDay: lastContinuousDay)
-                            Button {
-                                onSelectDate(date)
-                            } label: {
-                                CalendarDayCell(
-                                    evaluation: evaluation,
-                                    isToday: calendar.isDate(date, inSameDayAs: today),
-                                    isNextPossibleEntry: calendar.isDate(date, inSameDayAs: nextPossibleEntryDate ?? .distantPast),
-                                    size: cellSize
-                                )
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityHint("Opens trip planning with this entry date")
-                        } else {
-                            Color.clear
-                                .frame(width: cellSize, height: cellSize)
+            LazyVGrid(columns: columns, spacing: daySpacing) {
+                ForEach(Array(calculator.monthDates(containing: month).enumerated()), id: \.offset) { _, date in
+                    if let date {
+                        let evaluation = calculator.evaluation(for: date, lastContinuousDay: lastContinuousDay)
+                        Button {
+                            onSelectDate(date)
+                        } label: {
+                            CalendarDayCell(
+                                evaluation: evaluation,
+                                isToday: calendar.isDate(date, inSameDayAs: today),
+                                isNextPossibleEntry: calendar.isDate(date, inSameDayAs: nextPossibleEntryDate ?? .distantPast)
+                            )
                         }
+                        .buttonStyle(.plain)
+                        .accessibilityHint("Opens trip planning with this entry date")
+                    } else {
+                        Color.clear.aspectRatio(1, contentMode: .fit)
                     }
                 }
             }
-            .frame(maxWidth: .infinity)
         }
-        .frame(height: calendarHeight)
+        .frame(maxWidth: .infinity)
     }
 
     private var weekdaySymbols: [String] {
@@ -66,7 +64,6 @@ private struct CalendarDayCell: View {
     var evaluation: DayEvaluation
     var isToday: Bool
     var isNextPossibleEntry: Bool
-    var size: CGFloat
 
     var body: some View {
         ZStack {
@@ -82,7 +79,7 @@ private struct CalendarDayCell: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
-        .frame(width: size, height: size)
+        .aspectRatio(1, contentMode: .fit)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
     }
@@ -126,17 +123,24 @@ private struct CalendarDayCell: View {
     private var accessibilityLabel: String {
         let status: String
         if evaluation.isTripDay {
-            status = evaluation.canBeSchengenDay ? "planned trip day" : "planned trip day, exceeds allowance"
+            status = evaluation.canBeSchengenDay
+                ? String(localized: "planned trip day")
+                : String(localized: "planned trip day, exceeds allowance")
         } else if isNextPossibleEntry {
-            status = "next possible entry date, available Schengen day"
+            status = String(localized: "next possible entry date, available Schengen day")
         } else if evaluation.canBeSchengenDay {
-            status = "available Schengen day"
+            status = String(localized: "available Schengen day")
         } else {
-            status = "not available"
+            status = String(localized: "not available")
         }
 
-        let exitStatus = evaluation.isLastContinuousDay ? ", latest possible exit for the displayed entry date" : ""
-        return "\(evaluation.date.formatted(date: .complete, time: .omitted)), \(status)\(exitStatus), \(evaluation.usedDays) days used, \(evaluation.remainingDays) days remaining"
+        var parts = [evaluation.date.formatted(date: .complete, time: .omitted), status]
+        if evaluation.isLastContinuousDay {
+            parts.append(String(localized: "latest possible exit for the displayed entry date"))
+        }
+        parts.append(String(localized: "\(evaluation.usedDays) days used"))
+        parts.append(String(localized: "\(evaluation.remainingDays) days remaining"))
+        return parts.joined(separator: ", ")
     }
 }
 
@@ -169,7 +173,7 @@ struct LegendView: View {
 
 private struct LegendItem: View {
     var color: Color
-    var text: String
+    var text: LocalizedStringKey
     var outlined = false
 
     var body: some View {

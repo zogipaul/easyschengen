@@ -27,21 +27,15 @@ struct CalendarStayContext: Hashable {
 struct SchengenCalculator {
     private let calendar: Calendar
     private let trips: [Trip]
-    // Calendar-day offsets keep DST days inclusive without allocating every travel day.
-    private let epoch: Date
+    // Merged, sorted day ordinals keep counting exact without allocating every travel day.
     private let tripRanges: [ClosedRange<Int>]
 
     init(trips: [Trip], calendar: Calendar = .schengen) {
         self.calendar = calendar
         self.trips = trips
-        let epoch = calendar.startOfDay(for: Date(timeIntervalSinceReferenceDate: 0))
-        self.epoch = epoch
-        let ranges = trips.compactMap { trip -> ClosedRange<Int>? in
-            let start = calendar.dateComponents([.day], from: epoch, to: calendar.startOfDay(for: trip.startDate)).day ?? 0
-            let end = calendar.dateComponents([.day], from: epoch, to: calendar.startOfDay(for: trip.endDate)).day ?? 0
-            guard end >= start else { return nil }
-            return start...end
-        }.sorted { $0.lowerBound < $1.lowerBound }
+        let ranges = trips
+            .map { $0.start.ordinal...$0.end.ordinal }
+            .sorted { $0.lowerBound < $1.lowerBound }
         var merged: [ClosedRange<Int>] = []
         for range in ranges {
             if let last = merged.last, range.lowerBound <= last.upperBound + 1 {
@@ -57,7 +51,7 @@ struct SchengenCalculator {
         let today = calendar.startOfDay(for: date)
         let used = usedDays(endingOn: dayIndex(today))
         let remaining = max(0, 90 - used)
-        let maxTripEnd = trips.map(\.endDate).max()
+        let maxTripEnd = trips.map(\.end).max().map(self.date)
 
         return SchengenSummary(
             today: today,
@@ -72,10 +66,11 @@ struct SchengenCalculator {
     func calendarStayContext(on date: Date = .now) -> CalendarStayContext {
         let today = calendar.startOfDay(for: date)
         // A current trip sorts before any upcoming trip. Completed trips are ignored.
+        let todayDay = CalendarDay(today, calendar: calendar)
         let trip = trips
-            .filter { calendar.startOfDay(for: $0.endDate) >= today }
-            .min { $0.startDate < $1.startDate }
-        let entryDate = trip.map { calendar.startOfDay(for: $0.startDate) } ?? today
+            .filter { $0.end >= todayDay }
+            .min { $0.start < $1.start }
+        let entryDate = trip.map { self.date($0.start) } ?? today
 
         return CalendarStayContext(
             trip: trip,
@@ -145,7 +140,7 @@ struct SchengenCalculator {
             guard history + day - start + 1 <= 90 else { break }
             lastAllowed = day
         }
-        return lastAllowed.flatMap { calendar.date(byAdding: .day, value: $0, to: epoch) }
+        return lastAllowed.map { self.date(CalendarDay(ordinal: $0)) }
     }
 
     func monthDates(containing date: Date) -> [Date?] {
@@ -173,7 +168,11 @@ struct SchengenCalculator {
     }
 
     private func dayIndex(_ date: Date) -> Int {
-        calendar.dateComponents([.day], from: epoch, to: calendar.startOfDay(for: date)).day ?? 0
+        CalendarDay(date, calendar: calendar).ordinal
+    }
+
+    private func date(_ day: CalendarDay) -> Date {
+        day.date(in: calendar)
     }
 
     private func usedDays(endingOn day: Int) -> Int {

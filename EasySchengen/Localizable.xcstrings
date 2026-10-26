@@ -1,0 +1,1495 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "%@ to %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ bis %2$@"
+          }
+        }
+      }
+    },
+    "%@ – %@": {
+      "shouldTranslate": false
+    },
+    "%@ – %@ · %lld days": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ – %2$@ · %#@days@"
+          },
+          "substitutions": {
+            "days": {
+              "argNum": 3,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg day"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg days"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ – %2$@ · %#@days@"
+          },
+          "substitutions": {
+            "days": {
+              "argNum": 3,
+              "formatSpecifier": "lld",
+              "variations": {
+                "plural": {
+                  "one": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg Tag"
+                    }
+                  },
+                  "other": {
+                    "stringUnit": {
+                      "state": "translated",
+                      "value": "%arg Tage"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld": {
+      "shouldTranslate": false
+    },
+    "%lld Schengen days": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Schengen day"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Schengen days"
+                }
+              }
+            }
+          }
+        },
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Schengen-Tag"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Schengen-Tage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld countries selected": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld country selected"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld countries selected"
+                }
+              }
+            }
+          }
+        },
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Land ausgewählt"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Länder ausgewählt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld days available": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld day available"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld days available"
+                }
+              }
+            }
+          }
+        },
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Tag verfügbar"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Tage verfügbar"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld days remaining": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld day remaining"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld days remaining"
+                }
+              }
+            }
+          }
+        },
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Tag übrig"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Tage übrig"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld days used": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld day used"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld days used"
+                }
+              }
+            }
+          }
+        },
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Tag genutzt"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld Tage genutzt"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld of %lld": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld von %2$lld"
+          }
+        }
+      }
+    },
+    "%lld of %lld Schengen countries visited": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld von %2$lld Schengen-Ländern besucht"
+          }
+        }
+      }
+    },
+    "%lld saved trips could not be read and are not shown. A copy of the original data has been kept on this device.": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld saved trip could not be read and is not shown. A copy of the original data has been kept on this device."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld saved trips could not be read and are not shown. A copy of the original data has been kept on this device."
+                }
+              }
+            }
+          }
+        },
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld gespeicherte Reise konnte nicht gelesen werden und wird nicht angezeigt. Eine Kopie der Originaldaten wurde auf diesem Gerät aufbewahrt."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld gespeicherte Reisen konnten nicht gelesen werden und werden nicht angezeigt. Eine Kopie der Originaldaten wurde auf diesem Gerät aufbewahrt."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Add a trip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reise hinzufügen"
+          }
+        }
+      }
+    },
+    "Add destinations to %lld trips in your history to complete your country count.": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Add a destination to %lld trip in your history to complete your country count."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Add destinations to %lld trips in your history to complete your country count."
+                }
+              }
+            }
+          }
+        },
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Bei %lld Reise in deinem Verlauf fehlt noch das Reiseziel. Ergänze es, um deine Länderzahl zu vervollständigen."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Bei %lld Reisen in deinem Verlauf fehlen noch Reiseziele. Ergänze sie, um deine Länderzahl zu vervollständigen."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Add past and future stays to calculate your rolling 90/180-day allowance.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Füge vergangene und geplante Aufenthalte hinzu, um dein rollierendes 90/180-Tage-Kontingent zu berechnen."
+          }
+        }
+      }
+    },
+    "Add trip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reise hinzufügen"
+          }
+        }
+      }
+    },
+    "All time · through today": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gesamt · bis heute"
+          }
+        }
+      }
+    },
+    "Allowance check": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontingent-Check"
+          }
+        }
+      }
+    },
+    "Appearance": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Darstellung"
+          }
+        }
+      }
+    },
+    "Available": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verfügbar"
+          }
+        }
+      }
+    },
+    "Based on entry on %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bei Einreise am %@"
+          }
+        }
+      }
+    },
+    "Based on the previous 180 days": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Basierend auf den letzten 180 Tagen"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbrechen"
+          }
+        }
+      }
+    },
+    "Choose an earlier exit date to stay within the 90/180-day limit.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle ein früheres Ausreisedatum, um innerhalb der 90/180-Tage-Grenze zu bleiben."
+          }
+        }
+      }
+    },
+    "Choose countries": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Länder auswählen"
+          }
+        }
+      }
+    },
+    "Clear selection": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auswahl löschen"
+          }
+        }
+      }
+    },
+    "Coming up": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demnächst"
+          }
+        }
+      }
+    },
+    "Count down the days until your next Schengen trip.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zählt die Tage bis zu deiner nächsten Schengen-Reise."
+          }
+        }
+      }
+    },
+    "Countries": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Länder"
+          }
+        }
+      }
+    },
+    "Current trip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufende Reise"
+          }
+        }
+      }
+    },
+    "DAY": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TAG"
+          }
+        }
+      }
+    },
+    "DAYS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TAGE"
+          }
+        }
+      }
+    },
+    "DAYS LEFT": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TAGE ÜBRIG"
+          }
+        }
+      }
+    },
+    "Dark": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dunkel"
+          }
+        }
+      }
+    },
+    "Days used": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tage genutzt"
+          }
+        }
+      }
+    },
+    "Delete this trip?": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Reise löschen?"
+          }
+        }
+      }
+    },
+    "Delete trip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reise löschen"
+          }
+        }
+      }
+    },
+    "Destinations": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reiseziele"
+          }
+        }
+      }
+    },
+    "Easy Schengen": {
+      "shouldTranslate": false
+    },
+    "Edit trip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reise bearbeiten"
+          }
+        }
+      }
+    },
+    "Ends %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Endet am %@"
+          }
+        }
+      }
+    },
+    "Entry": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einreise"
+          }
+        }
+      }
+    },
+    "Entry and exit days each count as a full Schengen day, even if you arrive late or leave early.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein- und Ausreisetag zählen jeweils als voller Schengen-Tag – auch wenn du spät ankommst oder früh abreist."
+          }
+        }
+      }
+    },
+    "Entry date": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einreisedatum"
+          }
+        }
+      }
+    },
+    "Exit": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausreise"
+          }
+        }
+      }
+    },
+    "Exit date": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausreisedatum"
+          }
+        }
+      }
+    },
+    "Find a country": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Land suchen"
+          }
+        }
+      }
+    },
+    "First day in the Schengen Area": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erster Tag im Schengen-Raum"
+          }
+        }
+      }
+    },
+    "For your trip starting %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Für deine Reise ab %@"
+          }
+        }
+      }
+    },
+    "If you continue your stay today": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wenn du deinen Aufenthalt heute fortsetzt"
+          }
+        }
+      }
+    },
+    "If you enter today": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wenn du heute einreist"
+          }
+        }
+      }
+    },
+    "In progress": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufend"
+          }
+        }
+      }
+    },
+    "Last day in the Schengen Area": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzter Tag im Schengen-Raum"
+          }
+        }
+      }
+    },
+    "Latest exit": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Späteste Ausreise"
+          }
+        }
+      }
+    },
+    "Latest possible exit": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spätestmögliche Ausreise"
+          }
+        }
+      }
+    },
+    "Latest possible exit: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spätestmögliche Ausreise: %@"
+          }
+        }
+      }
+    },
+    "Light": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hell"
+          }
+        }
+      }
+    },
+    "NEXT SCHENGEN TRIP": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NÄCHSTE SCHENGEN-REISE"
+          }
+        }
+      }
+    },
+    "NEXT TRIP · IN %lld DAYS": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "NEXT TRIP · IN %lld DAY"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "NEXT TRIP · IN %lld DAYS"
+                }
+              }
+            }
+          }
+        },
+        "de": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "NÄCHSTE REISE · IN %lld TAG"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "NÄCHSTE REISE · IN %lld TAGEN"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Next EU Trip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächste EU-Reise"
+          }
+        }
+      }
+    },
+    "Next month": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächster Monat"
+          }
+        }
+      }
+    },
+    "Next possible entry: %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nächstmögliche Einreise: %@"
+          }
+        }
+      }
+    },
+    "No Schengen day is available for this entry date.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Für dieses Einreisedatum ist kein Schengen-Tag verfügbar."
+          }
+        }
+      }
+    },
+    "No days currently available": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Derzeit keine Tage verfügbar"
+          }
+        }
+      }
+    },
+    "No entry available": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Einreise möglich"
+          }
+        }
+      }
+    },
+    "No entry available for this start date": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Für dieses Startdatum ist keine Einreise möglich"
+          }
+        }
+      }
+    },
+    "No stay available from today": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ab heute ist kein Aufenthalt möglich"
+          }
+        }
+      }
+    },
+    "Not specified": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht angegeben"
+          }
+        }
+      }
+    },
+    "Now": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jetzt"
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        }
+      }
+    },
+    "Opens the trip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffnet die Reise"
+          }
+        }
+      }
+    },
+    "Opens trip planning with this entry date": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffnet die Reiseplanung mit diesem Einreisedatum"
+          }
+        }
+      }
+    },
+    "Optional. Select every country you visit on this trip.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Optional. Wähle alle Länder, die du auf dieser Reise besuchst."
+          }
+        }
+      }
+    },
+    "PLAN AHEAD": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VORAUSPLANEN"
+          }
+        }
+      }
+    },
+    "Past": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vergangen"
+          }
+        }
+      }
+    },
+    "Past trip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vergangene Reise"
+          }
+        }
+      }
+    },
+    "Plan a trip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reise planen"
+          }
+        }
+      }
+    },
+    "Plan a trip in Easy Schengen to start the countdown.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plane eine Reise in Easy Schengen, um den Countdown zu starten."
+          }
+        }
+      }
+    },
+    "Plan your stay carefully": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plane deinen Aufenthalt sorgfältig"
+          }
+        }
+      }
+    },
+    "Previous month": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorheriger Monat"
+          }
+        }
+      }
+    },
+    "Returns to the current month": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Springt zum aktuellen Monat"
+          }
+        }
+      }
+    },
+    "Save": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sichern"
+          }
+        }
+      }
+    },
+    "Schengen Area": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schengen-Raum"
+          }
+        }
+      }
+    },
+    "Schengen countries": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schengen-Länder"
+          }
+        }
+      }
+    },
+    "Schengen countries visited": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Besuchte Schengen-Länder"
+          }
+        }
+      }
+    },
+    "Schengen day": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schengen-Tag"
+          }
+        }
+      }
+    },
+    "Schengen days": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schengen-Tage"
+          }
+        }
+      }
+    },
+    "Some saved data could not be read": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einige gespeicherte Daten konnten nicht gelesen werden"
+          }
+        }
+      }
+    },
+    "Start with your first trip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starte mit deiner ersten Reise"
+          }
+        }
+      }
+    },
+    "System": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System"
+          }
+        }
+      }
+    },
+    "TRIP IN PROGRESS": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "REISE LÄUFT"
+          }
+        }
+      }
+    },
+    "This removes the trip and recalculates your allowance.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Reise wird entfernt und dein Kontingent neu berechnet."
+          }
+        }
+      }
+    },
+    "This trip fits within your current 90/180-day allowance.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Reise passt in dein aktuelles 90/180-Tage-Kontingent."
+          }
+        }
+      }
+    },
+    "Tip: touch and hold a trip to edit or delete it.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tipp: Halte eine Reise gedrückt, um sie zu bearbeiten oder zu löschen."
+          }
+        }
+      }
+    },
+    "Travel calendar": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reisekalender"
+          }
+        }
+      }
+    },
+    "Travel dates": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reisedaten"
+          }
+        }
+      }
+    },
+    "Travel days": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reisetage"
+          }
+        }
+      }
+    },
+    "Travel stats": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reisestatistik"
+          }
+        }
+      }
+    },
+    "Trip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reise"
+          }
+        }
+      }
+    },
+    "Trips": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reisen"
+          }
+        }
+      }
+    },
+    "Trips planned": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reisen geplant"
+          }
+        }
+      }
+    },
+    "Trips taken": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reisen"
+          }
+        }
+      }
+    },
+    "Unavailable": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht verfügbar"
+          }
+        }
+      }
+    },
+    "Upcoming": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geplant"
+          }
+        }
+      }
+    },
+    "Upcoming trip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geplante Reise"
+          }
+        }
+      }
+    },
+    "YOUR ALLOWANCE": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DEIN KONTINGENT"
+          }
+        }
+      }
+    },
+    "YOUR HISTORY": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DEIN VERLAUF"
+          }
+        }
+      }
+    },
+    "YOUR JOURNEY": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DEINE REISEN"
+          }
+        }
+      }
+    },
+    "You can stay until %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du kannst bis %@ bleiben"
+          }
+        }
+      }
+    },
+    "You have room to travel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du hast Spielraum zum Reisen"
+          }
+        }
+      }
+    },
+    "Your next EU trip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine nächste EU-Reise"
+          }
+        }
+      }
+    },
+    "Your saved trips could not be read. A copy of the original data has been kept on this device and nothing was deleted.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine gespeicherten Reisen konnten nicht gelesen werden. Eine Kopie der Originaldaten wurde auf diesem Gerät aufbewahrt, es wurde nichts gelöscht."
+          }
+        }
+      }
+    },
+    "Your stats grow as you travel. Upcoming trips count from their entry date.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Statistik wächst mit jeder Reise. Geplante Reisen zählen ab ihrem Einreisetag."
+          }
+        }
+      }
+    },
+    "You’re clear to travel": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du kannst problemlos reisen"
+          }
+        }
+      }
+    },
+    "available Schengen day": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "verfügbarer Schengen-Tag"
+          }
+        }
+      }
+    },
+    "latest possible exit for the displayed entry date": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "spätestmögliche Ausreise für das angezeigte Einreisedatum"
+          }
+        }
+      }
+    },
+    "next possible entry date, available Schengen day": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nächstmögliches Einreisedatum, verfügbarer Schengen-Tag"
+          }
+        }
+      }
+    },
+    "not available": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nicht verfügbar"
+          }
+        }
+      }
+    },
+    "planned trip day": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "geplanter Reisetag"
+          }
+        }
+      }
+    },
+    "planned trip day, exceeds allowance": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "geplanter Reisetag, überschreitet das Kontingent"
+          }
+        }
+      }
+    },
+    "remaining, including today": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "verbleibend, inklusive heute"
+          }
+        }
+      }
+    },
+    "until your next trip": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "bis zu deiner nächsten Reise"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

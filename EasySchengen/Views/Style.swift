@@ -15,7 +15,7 @@ enum AppearanceMode: String, CaseIterable, Identifiable {
         rawValue
     }
 
-    var title: String {
+    var title: LocalizedStringKey {
         switch self {
         case .system:
             return "System"
@@ -135,6 +135,15 @@ extension Color {
         )
         #endif
     }
+}
+
+extension LinearGradient {
+    /// Background of the allowance hero and the trip editor summary.
+    static let hero = LinearGradient(
+        colors: [Color(red: 0.10, green: 0.16, blue: 0.46), Color(red: 0.08, green: 0.43, blue: 0.48)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
 }
 
 extension View {

@@ -35,10 +35,10 @@ struct TripCountdownProvider: TimelineProvider {
     }
 
     private func entry(at date: Date) -> TripCountdownEntry {
-        let today = calendar.startOfDay(for: date)
+        let today = CalendarDay(date, calendar: calendar)
         let trip = TripStore.load()
-            .filter { calendar.startOfDay(for: $0.endDate) >= today }
-            .min { $0.startDate < $1.startDate }
+            .filter { $0.end >= today }
+            .min { $0.start < $1.start }
         return TripCountdownEntry(date: date, nextTrip: trip)
     }
 }
@@ -49,33 +49,18 @@ struct TripCountdownWidgetView: View {
 
     private let calendar = Calendar.schengen
 
+    private var today: CalendarDay { CalendarDay(entry.date, calendar: calendar) }
+
     private var countdown: Int? {
-        guard let trip = entry.nextTrip else { return nil }
-        return max(
-            0,
-            calendar.dateComponents(
-                [.day],
-                from: calendar.startOfDay(for: entry.date),
-                to: calendar.startOfDay(for: trip.startDate)
-            ).day ?? 0
-        )
+        entry.nextTrip.map { max(0, today.days(to: $0.start)) }
     }
 
     private func remainingDays(for trip: Trip) -> Int {
-        max(
-            1,
-            (calendar.dateComponents(
-                [.day],
-                from: calendar.startOfDay(for: entry.date),
-                to: calendar.startOfDay(for: trip.endDate)
-            ).day ?? 0) + 1
-        )
+        max(1, today.days(to: trip.end) + 1)
     }
 
     private func isCurrent(_ trip: Trip) -> Bool {
-        let today = calendar.startOfDay(for: entry.date)
-        return calendar.startOfDay(for: trip.startDate) <= today &&
-            calendar.startOfDay(for: trip.endDate) >= today
+        trip.status(on: today) == .current
     }
 
     var body: some View {
@@ -124,13 +109,21 @@ struct TripCountdownWidgetView: View {
             Text(current ? "remaining, including today" : "until your next trip")
                 .font(.caption.weight(.semibold))
 
-            Text(
-                current
-                    ? "Ends \(trip.endDate.formatted(.dateTime.day().month(.abbreviated).year()))"
-                    : trip.startDate.formatted(.dateTime.day().month(.abbreviated).year())
-            )
+            Group {
+                if current {
+                    Text("Ends \(trip.endDate.formatted(.dateTime.day().month(.abbreviated).year()))")
+                } else {
+                    Text(trip.startDate.formatted(.dateTime.day().month(.abbreviated).year()))
+                }
+            }
                 .font(.caption2)
                 .foregroundStyle(.white.opacity(0.75))
+
+            if family != .systemSmall, let countries = trip.countries.title {
+                Text(countries)
+                    .font(.caption2.weight(.semibold))
+                    .lineLimit(1)
+            }
         }
     }
 

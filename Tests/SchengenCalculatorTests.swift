@@ -1,9 +1,8 @@
-import Foundation
+import XCTest
 
 // Compare the optimized range engine with an independent, enumerated-day oracle.
-@main
-struct SchengenCalculatorTests {
-    static func main() {
+final class SchengenCalculatorTests: XCTestCase {
+    func testRegressionChecks() {
         var seed: UInt64 = 20261025
         func random(_ upper: Int) -> Int {
             seed = seed &* 6364136223846793005 &+ 1442695040888963407
@@ -37,42 +36,41 @@ struct SchengenCalculatorTests {
                     let used = days.filter { $0 >= offset - 179 && $0 <= offset }.count
                     let last = lastAllowed(offset, days)
                     let evaluation = calculator.evaluation(for: date(offset).addingTimeInterval(3600), lastContinuousDay: last)
-                    precondition(evaluation.usedDays == used, "Window mismatch in \(zone)")
-                    precondition(evaluation.isTripDay == days.contains(offset))
-                    precondition(evaluation.canBeSchengenDay == (used + (days.contains(offset) ? 0 : 1) <= 90))
-                    precondition(evaluation.remainingDays == max(0, 90 - used))
+                    XCTAssertTrue(evaluation.usedDays == used, "Window mismatch in \(zone)")
+                    XCTAssertTrue(evaluation.isTripDay == days.contains(offset))
+                    XCTAssertTrue(evaluation.canBeSchengenDay == (used + (days.contains(offset) ? 0 : 1) <= 90))
+                    XCTAssertTrue(evaluation.remainingDays == max(0, 90 - used))
                     let summary = calculator.summary(on: date(offset))
-                    precondition(summary.usedToday == used)
-                    precondition(summary.lastContinuousDay == last, "Continuous stay mismatch in \(zone)")
+                    XCTAssertTrue(summary.usedToday == used)
+                    XCTAssertTrue(summary.lastContinuousDay == last, "Continuous stay mismatch in \(zone)")
                     let searchStart = max(offset, (ranges.map(\.upperBound).max() ?? (offset - 1)) + 1)
                     let next = (searchStart..<(searchStart + 370)).first { candidate in
                         days.union([candidate]).filter { $0 >= candidate - 179 && $0 <= candidate }.count <= 90
                     }
-                    precondition(summary.nextPossibleEntryDate == next.map(date))
+                    XCTAssertTrue(summary.nextPossibleEntryDate == next.map(date))
                     if let first = trips.first {
                         let excludedDays = Set(ranges.dropFirst().flatMap { Array($0) })
-                        precondition(calculator.latestPossibleExit(from: date(offset), excluding: first.id) == lastAllowed(offset, excludedDays))
+                        XCTAssertTrue(calculator.latestPossibleExit(from: date(offset), excluding: first.id) == lastAllowed(offset, excludedDays))
                     }
                     checks += 1
                 }
             }
             let ninety = Trip(startDate: date(0), endDate: date(89), calendar: calendar)
             let full = SchengenCalculator(trips: [ninety, ninety], calendar: calendar)
-            precondition(full.evaluation(for: date(89), lastContinuousDay: nil).usedDays == 90)
-            precondition(full.lastContinuousStayDay(from: date(90)) == nil)
-            precondition(full.lastContinuousStayDay(from: date(180)) == date(269))
+            XCTAssertTrue(full.evaluation(for: date(89), lastContinuousDay: nil).usedDays == 90)
+            XCTAssertTrue(full.lastContinuousStayDay(from: date(90)) == nil)
+            XCTAssertTrue(full.lastContinuousStayDay(from: date(180)) == date(269))
             let month = full.monthDates(containing: date(28)) // Leap February 2024.
-            precondition(month.count % 7 == 0 && month.compactMap { $0 }.count == 29)
+            XCTAssertTrue(month.count % 7 == 0 && month.compactMap { $0 }.count == 29)
             // Long imports must use bounded memory and retain inclusive counts.
             let long = SchengenCalculator(trips: [Trip(startDate: date(-36500), endDate: date(0), calendar: calendar)], calendar: calendar)
-            precondition(long.summary(on: date(0)).usedToday == 180)
-            precondition(long.summary(on: date(180)).availableToday == 90)
+            XCTAssertTrue(long.summary(on: date(0)).usedToday == 180)
+            XCTAssertTrue(long.summary(on: date(180)).availableToday == 90)
             let expired = SchengenCalculator(trips: [Trip(startDate: date(-36500), endDate: date(-200), calendar: calendar)], calendar: calendar)
             for offset in -24...0 {
                 let expected = max(0, -200 - (offset - 179) + 1)
-                precondition(expired.evaluation(for: date(offset), lastContinuousDay: nil).usedDays == expected)
+                XCTAssertTrue(expired.evaluation(for: date(offset), lastContinuousDay: nil).usedDays == expected)
             }
         }
-        print("Calculator oracle: \(checks) scenarios passed across 4 time zones, plus overlap, 90/180 boundaries, leap year and long imports.")
     }
 }
