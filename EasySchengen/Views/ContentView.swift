@@ -1,3 +1,4 @@
+import StoreKit
 import SwiftUI
 
 private struct DashboardSnapshot {
@@ -17,6 +18,7 @@ private struct DashboardSnapshot {
 struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.requestReview) private var requestReview
     @AppStorage("appearanceMode") private var appearanceModeRawValue = AppearanceMode.system.rawValue
 
     @State private var trips: [Trip]
@@ -25,6 +27,7 @@ struct ContentView: View {
     @State private var editorContext: TripEditorContext?
     @State private var tripPendingDeletion: Trip?
     @State private var loadIssue: TripStore.LoadResult?
+    @State private var shouldRequestReview = false
 
     private let calendar = Calendar.schengen
 
@@ -63,7 +66,7 @@ struct ContentView: View {
             .inlineNavigationTitleWhenAvailable()
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar { toolbarContent }
-            .sheet(item: $editorContext) { context in
+            .sheet(item: $editorContext, onDismiss: requestReviewIfNeeded) { context in
                 TripEditorView(context: context, existingTrips: trips) { trip in
                     upsert(trip)
                 } onDelete: { trip in
@@ -400,8 +403,20 @@ struct ContentView: View {
             trips[index] = trip
         } else {
             trips.append(trip)
+            shouldRequestReview = true
         }
         trips = trips.sortedForDisplay()
+    }
+
+    /// Asks for an App Store review once the editor sheet is gone after a new
+    /// trip was added. The system decides whether the prompt actually appears.
+    private func requestReviewIfNeeded() {
+        guard shouldRequestReview else { return }
+        shouldRequestReview = false
+        Task {
+            try? await Task.sleep(for: .seconds(0.6))
+            requestReview()
+        }
     }
 
     private func delete(_ trip: Trip) {
